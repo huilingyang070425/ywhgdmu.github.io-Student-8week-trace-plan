@@ -1,0 +1,322 @@
+        /* 移动端优化样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            padding: 10px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .mobile-container {
+            max-width: 100%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: #4a6cf7;
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .header h1 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: #e0e0e0;
+        }
+        
+        .progress {
+            height: 100%;
+            background: #4a6cf7;
+            transition: width 0.3s ease;
+        }
+        
+        .content-area {
+            padding: 20px 15px;
+            min-height: 60vh;
+        }
+        
+        /* 移动端表单优化 */
+        .jspsych-survey-text textarea {
+            font-size: 16px !important;
+            padding: 12px !important;
+            border-radius: 8px !important;
+            border: 1px solid #ddd !important;
+            min-height: 100px !important;
+        }
+        
+        .jspsych-survey-text input {
+            font-size: 16px !important;
+            padding: 12px !important;
+            border-radius: 8px !important;
+            border: 1px solid #ddd !important;
+            height: 50px !important;
+            width: 100% !important;
+        }
+        
+        /* 信息卡片样式 */
+        .info-card {
+            background: #f0f4ff;
+            border: 2px solid #4a6cf7;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .info-card h3 {
+            color: #4a6cf7;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        /* 任务清单样式 */
+        .task-checklist {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        .task-item input {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+        }
+        
+        /* 时间区块优化 */
+        .time-period {
+            background: #f1f3f4;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .time-period h3 {
+            color: #4a6cf7;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        /* 响应式文字大小 */
+        .jspsych-display-element {
+            font-size: 16px !important;
+            line-height: 1.5 !important;
+        }
+        
+        .jspsych-instructions {
+            font-size: 16px !important;
+        }
+        
+        .section-title {
+            color: #4a6cf7;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+        
+        /* 移动端按钮优化 */
+        .jspsych-btn {
+            display: block !important;
+            width: 100% !important;
+            padding: 14px 20px !important;
+            border: none !important;
+            border-radius: 10px !important;
+            font-size: 1rem !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            margin: 8px 0 !important;
+            text-align: center !important;
+            min-height: 50px !important;
+            background: #4a6cf7 !important;
+            color: white !important;
+        }
+        
+        .jspsych-btn:hover, .jspsych-btn:active {
+            background: #3a5bd9 !important;
+            transform: translateY(-2px) !important;
+        }
+
+        /* 圆形按钮评估样式 - 通用 */
+        .rating-scale {
+            margin: 30px 0;
+        }
+        
+        .rating-question {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #333;
+            line-height: 1.4;
+        }
+        
+        .rating-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .rating-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .rating-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid #ddd;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        .rating-circle input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .rating-circle .checkmark {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .rating-circle input:checked + .checkmark {
+            background: #4a6cf7;
+            border-color: #4a6cf7;
+        }
+        
+        .rating-circle input:checked + .checkmark::after {
+            content: "✓";
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .rating-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        /* 对称放大效果 - 7个选项 */
+        .rating-option:nth-child(1) .rating-circle,
+        .rating-option:nth-child(7) .rating-circle {
+            width: 60px;
+            height: 60px;
+            border-width: 4px;
+        }
+        
+        .rating-option:nth-child(2) .rating-circle,
+        .rating-option:nth-child(6) .rating-circle {
+            width: 55px;
+            height: 55px;
+            border-width: 3px;
+        }
+        
+        .rating-option:nth-child(3) .rating-circle,
+        .rating-option:nth-child(5) .rating-circle {
+            width: 50px;
+            height: 50px;
+            border-width: 2px;
+        }
+        
+        .rating-option:nth-child(4) .rating-circle {
+            width: 45px;
+            height: 45px;
+            border-width: 2px;
+        }
+        
+        /* 悬停效果 */
+        .rating-circle:hover {
+            transform: scale(1.1);
+            border-color: #4a6cf7;
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 480px) {
+            .rating-options {
+                gap: 5px;
+            }
+            
+            .rating-label {
+                font-size: 0.7rem;
+            }
+            
+            .rating-option:nth-child(1) .rating-circle,
+            .rating-option:nth-child(7) .rating-circle {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .rating-option:nth-child(2) .rating-circle,
+            .rating-option:nth-child(6) .rating-circle {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .rating-option:nth-child(3) .rating-circle,
+            .rating-option:nth-child(5) .rating-circle {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .rating-option:nth-child(4) .rating-circle {
+                width: 35px;
+                height: 35px;
+            }
+        }
+        
+        /* 确保所有JS Psych按钮可见 */
+        button.jspsych-btn {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }

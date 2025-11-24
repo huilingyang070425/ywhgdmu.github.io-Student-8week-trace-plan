@@ -1,0 +1,477 @@
+<!-- html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><link href="css/style.css" rel="stylesheet" type="text/css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>每日时间决策研究</title>
+    <script src="https://unpkg.com/jspsych@7.3.4"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-instructions@1.1.3"></script>
+    <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css">
+    <script>
+    // 防止在file://协议下运行某些功能
+    if (window.location.protocol === 'file:') {
+    console.log('运行在本地文件模式');
+    } else {
+    console.log('运行在服务器模式');
+    }
+    </script>
+</head>
+<body>
+    <div class="mobile-container">
+        <div class="header">
+            <h1>每日时间决策研究</h1>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progressBar" style="width: 0%"></div>
+        </div>
+        
+        <div class="content-area" id="contentArea">
+            <!-- JS Psych实验将在这里渲染 -->
+        </div>
+    </div>
+
+    <script>
+        // 初始化JS Psych（移动端优化配置）
+        const jsPsych = initJsPsych({
+            display_element: 'contentArea',
+            on_finish: function() {
+                const data = jsPsych.data.get().json();
+                
+                // 保存数据到localStorage
+                try {
+                    localStorage.setItem('dailyDecisionData', JSON.stringify(data));
+                    
+                    // 提供数据下载
+                    const dataStr = JSON.stringify(data, null, 2);
+                    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                    const dataUrl = URL.createObjectURL(dataBlob);
+                    
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = dataUrl;
+                    downloadLink.download = '每日决策数据.json';
+                    downloadLink.textContent = '点击下载数据';
+                    downloadLink.style.cssText = `
+                        display: block; padding: 15px; background: #4a6cf7; 
+                        color: white; text-align: center; border-radius: 8px;
+                        margin: 10px 0; text-decoration: none; font-weight: bold;
+                    `;
+                    
+                    document.getElementById('contentArea').innerHTML = `
+                        <div style="text-align: center; padding: 30px;">
+                            <h2>调查完成！</h2>
+                            <div style="font-size: 3rem; margin: 20px 0;">✅</div>
+                            <p style="margin: 15px 0;">感谢您的参与</p>
+                            <p style="margin: 15px 0;">数据已保存</p>
+                        </div>
+                    `;
+                    document.getElementById('contentArea').appendChild(downloadLink);
+                    
+                } catch (e) {
+                    alert('调查完成！数据已保存到本地。');
+                    console.log('研究数据:', data);
+                }
+            },
+            on_trial_start: function() {
+                // 更新进度条
+                const progress = (jsPsych.getProgressBarCompleted() * 100).toFixed(0);
+                document.getElementById('progressBar').style.width = progress + '%';
+            },
+            // 移动端特定配置
+            default_iti: 250,
+            show_progress_bar: true,
+            auto_update_progress_bar: false
+        });
+
+        // 实验时间线
+        const timeline = [];
+
+        // 欢迎页面
+        timeline.push({
+            type: jsPsychInstructions,
+            pages: [
+                `<div style="text-align: center; padding: 20px;">
+                    <h2>欢迎参加每日时间决策研究</h2>
+                    <p style="margin: 15px 0;">本研究旨在了解人们如何管理日常时间</p>
+                    <p style="margin: 15px 0;">请根据您的实际情况回答以下问题</p>
+                    <p style="margin: 15px 0;">所有数据都将被匿名处理</p>
+                    <div class="info-card">
+                        <h3>📱 移动端优化</h3>
+                        <p>本调查已针对手机设备优化，请放心填写</p>
+                    </div>
+                </div>`
+            ],
+            show_clickable_nav: true,
+            button_label_next: '开始调查'
+        });
+
+        // 参与者信息 - 已移除学院收集
+        timeline.push({
+            type: jsPsychSurveyText,
+            preamble: `
+                <h3 class="section-title">参与者信息</h3>
+                <div class="info-card">
+                    <h3>📋 信息填写说明</h3>
+                    <p>请填写您的基本信息，用于研究联系和数据验证</p>
+                </div>
+            `,
+            questions: [
+                {
+                    prompt: '学号:',
+                    placeholder: '请输入您的学号',
+                    required: true,
+                    name: 'student_id',
+                    rows: 1
+                },
+                {
+                    prompt: '手机号:',
+                    placeholder: '请输入您的手机号码',
+                    required: true,
+                    name: 'phone_number', 
+                    rows: 1
+                },
+                {
+                    prompt: '年级:',
+                    placeholder: '例如：2023级',
+                    required: true,
+                    name: 'grade',
+                    rows: 1
+                }
+            ],
+            on_load: function() {
+                // 添加输入类型优化
+                setTimeout(() => {
+                    const phoneInput = document.querySelector('input[name="phone_number"]');
+                    if (phoneInput) {
+                        phoneInput.type = 'tel';
+                        phoneInput.pattern = '[0-9]*';
+                        phoneInput.inputMode = 'numeric';
+                    }
+                }, 100);
+            }
+        });
+
+        // 学院选择页面
+        timeline.push({
+            type: jsPsychSurveyMultiChoice,
+            preamble: `
+                <h3 class="section-title">请确认您的学院</h3>
+                <p>请从以下选项中选择您所在的学院：</p>
+            `,
+            questions: [
+                {
+                    prompt: '请选择您的学院:',
+                    options: [
+                        '生物医学工程学院',
+                        '人文管理学院', 
+                        '第二临床医学院',
+                        '外国语学院',
+                        '马克思主义学院',
+                        '医学技术学院',
+                        '护理学院',
+                        '药学院',
+                        '公共卫生学院'
+                    ],
+                    horizontal: false,
+                    required: true,
+                    name: 'college_confirmation'
+                }
+            ]
+        });
+
+        // 昨日任务完成情况
+        timeline.push({
+            type: jsPsychSurveyMultiChoice,
+            preamble: `
+                <h3 class="section-title">昨日任务完成情况</h3>
+                <p>在您今天收到的电子邮件中，提供了您昨天决定要做的所有事情的列表。</p>
+                <p>请从电子邮件列表中选择您昨天最终实际完成的事项：</p>
+            `,
+            questions: [
+                {
+                    prompt: '请选择您昨天实际完成的任务:',
+                    options: ['任务 1', '任务 2', '任务 3', '任务 4', '任务 5', '任务 6', 
+                             '任务 7', '任务 8', '任务 9', '任务 10', '任务 11', '任务 12'],
+                    horizontal: false,
+                    required: false,
+                    name: 'completed_tasks'
+                }
+            ]
+        });
+
+        // 自定义情绪评估页面 - 使用圆形按钮对称布局
+        const emotionQuestions = [
+            {
+                name: 'positive_negative',
+                question: '积极-消极',
+                labels: ['-3 非常消极', '-2', '-1', '0 中性', '+1', '+2', '+3 非常积极']
+            },
+            {
+                name: 'weak_strong',
+                question: '虚弱-强壮',
+                labels: ['-3 非常虚弱', '-2', '-1', '0 中性', '+1', '+2', '+3 非常强壮']
+            },
+            {
+                name: 'passive_active',
+                question: '被动-主动',
+                labels: ['-3 非常被动', '-2', '-1', '0 中性', '+1', '+2', '+3 非常主动']
+            }
+        ];
+
+        emotionQuestions.forEach(emotion => {
+            timeline.push({
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: `
+                    <div class="rating-scale">
+                        <h3 class="section-title">情绪评估</h3>
+                        <p>总的来说，您昨天在以下维度感受如何：</p>
+                        <div class="rating-question">${emotion.question}</div>
+                        <div class="rating-options">
+                            ${emotion.labels.map((label, index) => `
+                                <div class="rating-option">
+                                    <label class="rating-circle">
+                                        <input type="radio" name="${emotion.name}" value="${index + 1}">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="rating-label">${label}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `,
+                choices: "NO_KEYS",
+                trial_duration: null,
+                on_load: function() {
+                    // 添加单选按钮交互
+                    const radioButtons = document.querySelectorAll(`input[name="${emotion.name}"]`);
+                    radioButtons.forEach(radio => {
+                        radio.addEventListener('change', function() {
+                            if (this.checked) {
+                                // 记录选择并继续
+                                const data = {
+                                    response: this.value,
+                                    question: emotion.name
+                                };
+                                jsPsych.finishTrial(data);
+                            }
+                        });
+                    });
+                },
+                data: {
+                    question_type: 'emotion_rating',
+                    question_name: emotion.name
+                }
+            });
+        });
+
+        // 时间分配评估 - 使用圆形按钮对称布局
+        const timeAllocationQuestions = [
+            {
+                name: 'important_time',
+                question: '您在重要的事情上花了多少时间？',
+                labels: ['1 没花任何时间', '2', '3', '4', '5', '6', '7 所有时间']
+            },
+            {
+                name: 'urgent_time',
+                question: '您在紧急的事情上花了多少时间？',
+                labels: ['1 没花任何时间', '2', '3', '4', '5', '6', '7 所有时间']
+            },
+            {
+                name: 'useful_time',
+                question: '您有效利用了多少时间？',
+                labels: ['1 没有有效利用', '2', '3', '4', '5', '6', '7 所有时间有效利用']
+            },
+            {
+                name: 'wasted_time',
+                question: '您浪费了多少时间？',
+                labels: ['1 没有浪费时间', '2', '3', '4', '5', '6', '7 所有时间都浪费']
+            },
+            {
+                name: 'happiness',
+                question: '您对自己昨天的时间安排感到多快乐？',
+                labels: ['1 一点都不快乐', '2', '3', '4', '5', '6', '7 非常快乐']
+            },
+            {
+                name: 'regret',
+                question: '您对自己昨天的时间安排感到多后悔？',
+                labels: ['1 一点也不后悔', '2', '3', '4', '5', '6', '7 非常后悔']
+            },
+            {
+                name: 'control',
+                question: '您感觉对自己时间的掌控程度如何？',
+                labels: ['1 完全无法掌控', '2', '3', '4', '5', '6', '7 完全掌控']
+            }
+        ];
+
+        // 添加时间分配评估介绍页面
+        timeline.push({
+            type: jsPsychInstructions,
+            pages: [
+                `<div style="text-align: center; padding: 20px;">
+                    <h3 class="section-title">时间分配评估</h3>
+                    <p style="margin: 15px 0;">接下来，请评估您昨天的时间使用情况</p>
+                    <p style="margin: 15px 0;">每个问题请选择一个最能反映您情况的选项</p>
+                    <div class="info-card">
+                        <h3>💡 提示</h3>
+                        <p>点击圆形按钮选择您的答案</p>
+                        <p>两端按钮代表极端情况，中间按钮代表中性情况</p>
+                    </div>
+                </div>`
+            ],
+            show_clickable_nav: true,
+            button_label_next: '开始评估'
+        });
+
+        // 为每个时间分配问题创建单独的页面
+        timeAllocationQuestions.forEach(question => {
+            timeline.push({
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: `
+                    <div class="rating-scale">
+                        <div class="rating-question">${question.question}</div>
+                        <div class="rating-options">
+                            ${question.labels.map((label, index) => `
+                                <div class="rating-option">
+                                    <label class="rating-circle">
+                                        <input type="radio" name="${question.name}" value="${index + 1}">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <div class="rating-label">${label}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `,
+                choices: "NO_KEYS",
+                trial_duration: null,
+                on_load: function() {
+                    // 添加单选按钮交互
+                    const radioButtons = document.querySelectorAll(`input[name="${question.name}"]`);
+                    radioButtons.forEach(radio => {
+                        radio.addEventListener('change', function() {
+                            if (this.checked) {
+                                // 记录选择并继续
+                                const data = {
+                                    response: this.value,
+                                    question: question.name
+                                };
+                                jsPsych.finishTrial(data);
+                            }
+                        });
+                    });
+                },
+                data: {
+                    question_type: 'time_allocation',
+                    question_name: question.name
+                }
+            });
+        });
+
+        // 今日决策 - 四个时间段
+        const timePeriods = [
+            { 
+                name: '现在到中午12点', 
+                time: '现在 - 12:00',
+                preamble: `
+                    <div class="time-period">
+                        <h3>今日时间决策 - 上午</h3>
+                        <p><strong>时间段：现在到中午12点</strong></p>
+                        <p>请告诉我们您今天已经决定如何度过这段时间。</p>
+                        <p>请将您决定在今天这个时间段内做的不同事情分别写在不同的行上。</p>
+                        <p>请用完整句子书写回答（例如"我决定从9点到10点学习心理学"）</p>
+                    </div>
+                `
+            },
+            { 
+                name: '中午12点到下午4点', 
+                time: '12:00 - 16:00',
+                preamble: `
+                    <div class="time-period">
+                        <h3>今日时间决策 - 下午</h3>
+                        <p><strong>时间段：中午12点到下午4点</strong></p>
+                        <p>请告诉我们您今天已经决定如何度过这段时间。</p>
+                        <p>请将您决定在今天这个时间段内做的不同事情分别写在不同的行上。</p>
+                    </div>
+                `
+            },
+            { 
+                name: '下午4点到晚上8点', 
+                time: '16:00 - 20:00',
+                preamble: `
+                    <div class="time-period">
+                        <h3>今日时间决策 - 傍晚</h3>
+                        <p><strong>时间段：下午4点到晚上8点</strong></p>
+                        <p>请告诉我们您今天已经决定如何度过这段时间。</p>
+                        <p>请将您决定在今天这个时间段内做的不同事情分别写在不同的行上。</p>
+                    </div>
+                `
+            },
+            { 
+                name: '晚上8点到就寝时间', 
+                time: '20:00 - 睡前',
+                preamble: `
+                    <div class="time-period">
+                        <h3>今日时间决策 - 晚上</h3>
+                        <p><strong>时间段：晚上8点到就寝时间</strong></p>
+                        <p>请告诉我们您今天已经决定如何度过这段时间。</p>
+                        <p>请将您决定在今天这个时间段内做的不同事情分别写在不同的行上。</p>
+                    </div>
+                `
+            }
+        ];
+
+        timePeriods.forEach((period, index) => {
+            timeline.push({
+                type: jsPsychSurveyText,
+                preamble: period.preamble,
+                questions: [
+                    {
+                        prompt: '请写下您的计划（每行一件事）:',
+                        rows: 4,
+                        columns: 40,
+                        required: true,
+                        name: `decisions_${index + 1}`
+                    }
+                ]
+            });
+        });
+
+        // 完成页面
+        timeline.push({
+            type: jsPsychInstructions,
+            pages: [
+                `<div style="text-align: center; padding: 30px;">
+                    <h2>调查完成！</h2>
+                    <div style="font-size: 3rem; margin: 20px 0;">✅</div>
+                    <p style="margin: 15px 0;">感谢您完成今日的调查</p>
+                    <p style="margin: 15px 0;">请记得明天继续参与</p>
+                    <p style="margin: 15px 0;">您的参与对我们的研究非常重要！</p>
+                </div>`
+            ],
+            show_clickable_nav: true,
+            button_label_next: '完成'
+        });
+
+        // 开始实验
+        jsPsych.run(timeline);
+
+        // 移动端触摸优化
+        document.addEventListener('touchstart', function() {}, { passive: true });
+        
+        // 防止双击缩放
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
